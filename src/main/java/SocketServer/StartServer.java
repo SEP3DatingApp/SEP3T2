@@ -1,6 +1,7 @@
 package SocketServer;
 
 import ObjectsFromAPI.Song;
+import ObjectsFromAPI.User;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -21,7 +22,7 @@ public class StartServer {
     private BufferedReader in;
 
     public void start(int port) {
-        //GetSongListFromAPI();
+        GetFishersFromList();
         try {
             serverSocket = new ServerSocket(port);
             System.out.println("Server started");
@@ -48,11 +49,11 @@ public class StartServer {
         }
     }
 
-    public static void GetSongListFromAPI()
+    public static void GetFishersFromList()
     {
-        String output = "abc";
+        String output = "";
         try {
-            URL url = new URL("https://localhost:44340/Songs");
+            URL url = new URL("https://localhost:44312/api/Fishers");
             HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/json");
@@ -72,28 +73,42 @@ public class StartServer {
                 jsonString += output;
                 System.out.println(jsonString);
             }
-            List<Song> songs = new ArrayList<>();
+            List<User> users = new ArrayList<>();
             //JSON parser object to parse read file
             JSONArray jsonArray = new JSONArray(jsonString);
 
             for (int i=0; i<jsonArray.length(); i++) {
                 JSONObject jsonSong = jsonArray.getJSONObject(i);
-                int songID = jsonSong.getInt("songID");
-                int voteamount = jsonSong.getInt("voteAmount");
-                int categoryID = jsonSong.getInt("categoryID");
-                String title = jsonSong.getString("title");
-                String artist = jsonSong.getString("artist");
-                Song song = new Song();
-                song.setSongID(songID);
-                song.setVoteAmount(voteamount);
-                song.setCategoryID(categoryID);
-                song.setTitle(title);
-                song.setArtist(artist);
-                songs.add(song);
+                int UserID = jsonSong.getInt("userId");
+                String username = jsonSong.getString("username");
+                String password = jsonSong.getString("password");
+                String usertype = jsonSong.getString("discriminator");
+                String email = jsonSong.getString("email");
+                String gender = jsonSong.getString("gender");
+                String sexProef = jsonSong.getString("sexPref");
+                String picRef = jsonSong.getString("picRef");
+                int age = jsonSong.getInt("age");
+                boolean isActive = jsonSong.getBoolean("isActive");
+                String name = jsonSong.getString("name");
+                String description = jsonSong.getString("description");
+
+                User usr = new User();
+                usr.setUserId(UserID);
+                usr.setUsername(username);
+                usr.setPassword(password);
+                usr.setUserType(usertype);
+                usr.setEmail(email);
+                usr.setGender(gender);
+                usr.setSexPref(sexProef);
+                usr.setPicRef(picRef);
+                usr.setAge(age);
+                usr.setisActive(isActive);
+                usr.setName(name);
+                usr.setDescription(description);
+                users.add(usr);
             }
 
-            System.out.println(songs.get(0).artist + "\n"
-            + songs.get(0).title + "\n");
+            System.out.println("Username: " + users.get(0).getUsername());
 
             conn.disconnect();
 
@@ -103,5 +118,10 @@ public class StartServer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void getFisherAccordingToID(String username, String password)
+    {
+
     }
 }
