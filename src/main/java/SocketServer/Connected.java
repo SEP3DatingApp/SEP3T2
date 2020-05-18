@@ -1,6 +1,9 @@
 package SocketServer;
 
+import CRUDForAPI.CRUDMethods;
+import ObjectsFromAPI.User;
 import Shared.Request;
+import Shared.RequestTypes;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -9,6 +12,8 @@ import java.net.Socket;
 public class Connected implements Runnable{
 
     private Socket clientsocket;
+    private Object RequestTypes;
+
     public Connected(Socket socket)
     {
         clientsocket = socket;
@@ -20,22 +25,28 @@ public class Connected implements Runnable{
             String newjson = "";
             InputStream in = clientsocket.getInputStream();
             byte[] bytes = new byte[100];
-            int count;
-            while ((count = in.read(bytes)) != 0) {
-                json += new String(bytes,0,count);
-                if (json.contains(";"))
-                {
-                    newjson = json.replace(";" , "");
-                    break;
-                }
-            }
-            JSONObject jsonObject = new JSONObject(newjson);
-            Request rq = new Request(jsonObject.getString("Type"),jsonObject.getJSONObject("Arg"));
-            if ( rq.getType().equals("CREATEUSER"))
+
+//
+//            while (in.read(bytes) != 0)
+//            {
+                json = new String(in.readAllBytes());
+
+
+//                if (json.contains(";"))
+//                {
+//                    newjson = json.replace(";" , "");
+//                    break;
+//                }
+//            }
+
+            JSONObject jsonObject = new JSONObject(json);
+            Request rq = new Request( jsonObject.getString("Type"), jsonObject.getJSONObject("Args")); //TODO: should work maybe??
+            if ( rq.getType().equals(Shared.RequestTypes.CREATEUSER.toString()))
             {
                 CreateUser(rq.getArgs());
-                System.out.println("IT IS CREATE USER");
+
             }
+            //TODO : else statements
         } catch(IOException e) {
             e.printStackTrace();
         }
@@ -46,8 +57,12 @@ public class Connected implements Runnable{
         }
     }
 
-    public void CreateUser(Object usr)
+    public void CreateUser(JSONObject usr)
     {
+
+        //prints response info 200 if successful
+        System.out.println(CRUDMethods.create(usr)); ;// TODO create user in api using post
+
     }
 
     @Override

@@ -1,5 +1,7 @@
 package Shared;
 
+import org.json.JSONObject;
+
 public class Request {
     public String Type;
     public Object Args;
@@ -11,8 +13,14 @@ public class Request {
     }
     public String getType() {
         return Type;
-    }
-    public Object getArgs() {
-        return Args;
+    } //GETALLUSERS,GETUSER,CREATEUSER,LOGIN
+    public JSONObject getArgs() {
+        return (JSONObject) Args;
+    } //user
+
+    @Override
+    public String toString()
+    {
+        return "Request{" + "Type='" + Type + '\'' + ", Args=" + Args + '}';
     }
 }
