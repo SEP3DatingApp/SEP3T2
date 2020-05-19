@@ -11,17 +11,19 @@ public class Client
 {
     public static void main(String[] args)
     {
-        Socket s = null;
-        DataOutputStream dout = null;
-        Request request = new Request(RequestTypes.CREATEUSER.toString(), new User(1, "Fisher", "Bybis", "bybinini", "afs@fff.com", "male", "males", "1234", 24, true, "nesomani", "nzn krc", true));
+        Socket s;
+        DataOutputStream dout;
+        Request request = new Request(RequestTypes.CREATEUSER.toString(), new User("client2","qwerty","chan@bybs.com",'m','f',"ara","kakutis",23,"garis"));
 
         try
         {
+            System.out.println("REQUEST client =" + request);
             String json = JsonConverter.convertObjectToJSONString(request);
+
 
             s = new Socket("localhost", 5000);
             dout = new DataOutputStream(s.getOutputStream());
-            dout.writeUTF(json);
+            dout.writeBytes(json);
             dout.flush();
             dout.close();
             s.close();

@@ -1,11 +1,17 @@
 package CRUDForAPI;
 
 import ObjectsFromAPI.User;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.json.JSONObject;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
@@ -15,56 +21,44 @@ public final class CRUDMethods
 {
     public static int create(JSONObject usr)
     {
-        String postData;
-        URL url;
-        HttpsURLConnection conn = null;
+
+
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost("https://localhost:44380/users/register");
+
+        String json = usr.toString();
+        System.out.println("JSON" + json);
+        StringEntity entity = null;
         try
-        { url = new URL("https://localhost:44380/users/register");
-            conn = (HttpsURLConnection) url.openConnection();
+        {
+            entity = new StringEntity(json);
+
+        } catch (UnsupportedEncodingException e)
+        {
+            e.printStackTrace();
+        }
+        httpPost.setEntity(entity);
+        httpPost.setHeader("Accept", "application/json");
+        httpPost.setHeader("Content-type", "application/json");
+
+        CloseableHttpResponse response = null;
+        try
+        {
+            response = client.execute(httpPost);
         } catch (IOException e)
         {
             e.printStackTrace();
         }
-        System.out.println("CREATECRUD");
+
         try
         {
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Accept", "application/json");
-
-            postData = usr.toString();
-            System.out.println("bybis+++++++++++++" + postData);
-
-
-            // For POST only - START
-            conn.setDoOutput(true);
-            OutputStream os = conn.getOutputStream();
-
-            os.write(postData.getBytes());//postData will be jason file
-            os.flush();
-            os.close();
-            // For POST only - END
-
-            if (conn.getResponseCode() != 200)
-            {
-                throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
-            }
-        } catch (MalformedURLException e)
-        {
-            e.printStackTrace();
-        } catch (ProtocolException e)
-        {
-            e.printStackTrace();
+            client.close();
         } catch (IOException e)
         {
             e.printStackTrace();
         }
-        try
-        {
-            return conn.getResponseCode();
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        return 0;
+        return response.getStatusLine().getStatusCode();
     }
+
+
 }

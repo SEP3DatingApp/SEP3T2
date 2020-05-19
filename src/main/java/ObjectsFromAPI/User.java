@@ -110,8 +110,4 @@ public class User {
     public void setisActive(boolean isActive) {
         this.isActive = isActive;
     }
-
-
-
-
 }
