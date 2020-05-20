@@ -10,12 +10,9 @@ public class StartServer
 {
     private ServerSocket serverSocket;
     private Socket clientSocket;
-    private PrintWriter out;
-    private BufferedReader in;
 
     public void start(int port)
     {
-        //        GetFishersFromList();
         try
         {
             serverSocket = new ServerSocket(port);
@@ -33,19 +30,19 @@ public class StartServer
         }
     }
 
-    public void stop()
-    {
-        try
-        {
-            in.close();
-            out.close();
-            clientSocket.close();
-            serverSocket.close();
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
+//    public void stop()
+//    {
+//        try
+//        {
+//            in.close();
+//            out.close();
+//            clientSocket.close();
+//            serverSocket.close();
+//        } catch (IOException e)
+//        {
+//            e.printStackTrace();
+//        }
+//    }
 
     //    public static void GetFishersFromList()
     //    {

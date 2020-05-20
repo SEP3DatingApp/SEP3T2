@@ -3,7 +3,7 @@ package Shared;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public final class JsonConverter
+public final class JsonConverter /**Useless class which is used only in client*/
     {
 
         static ObjectMapper mapper = new ObjectMapper();

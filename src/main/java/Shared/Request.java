@@ -23,4 +23,9 @@ public class Request {
     {
         return "Request{" + "Type='" + Type + '\'' + ", Args=" + Args + '}';
     }
+
+    public void setTypeToEmpty()
+    {
+        Type = "empty";
+    }
 }
