@@ -27,13 +27,13 @@ public class Client
 
 //            inputStream = new DataInputStream(s.getInputStream());
 
-            dout = new DataOutputStream(s.getOutputStream());
-            dout.writeBytes(json);
+//            dout = new DataOutputStream(s.getOutputStream());
+//            dout.writeBytes(json);
             //
 //            System.out.println(new String(inputStream.readAllBytes()));
 
-            dout.flush();
-            dout.close();
+//            dout.flush();
+//            dout.close();
             //            inputStream.close();
             s.close();
         } catch (IOException e)

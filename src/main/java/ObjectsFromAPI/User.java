@@ -1,7 +1,6 @@
 package ObjectsFromAPI;
 
 public class User {
-    public int UserId;
     public String userType;
     public String Username;
     public String Password;
@@ -17,14 +16,6 @@ public class User {
 
     public void setUserType(String userType) {
         this.userType = userType;
-    }
-
-    public int getUserId() {
-        return UserId;
-    }
-
-    public void setUserId(int userId) {
-        UserId = userId;
     }
 
     public String getUsername() {

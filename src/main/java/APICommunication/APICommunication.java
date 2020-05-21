@@ -1,4 +1,4 @@
-package CRUDForAPI;
+package APICommunication;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -133,7 +133,7 @@ public final class APICommunication
             //            client.close();
         } catch (IOException e)
         {
-            e.printStackTrace();
+            e.getMessage();
         }
 
         //        System.out.println(responseBody);

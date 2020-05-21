@@ -5,5 +5,6 @@ public enum RequestTypes
     GETALLUSERS,
     GETUSER,
     CREATEUSER,
-    LOGIN
+    LOGIN,
+    LOGOUT
 }
