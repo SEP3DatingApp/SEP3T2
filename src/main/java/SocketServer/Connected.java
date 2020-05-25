@@ -39,62 +39,75 @@ public class Connected implements Runnable
                 while ((count = inputStream.read(bytes)) != 0)
                 {
                     json += new String(bytes, 0, count);
-                    System.out.println(json);//testing if we receive any data at all
+//                    System.out.println(json);//testing if we receive any data at all
                     if (json.contains(";"))
                     {
                         json.replace(";", "");
                         break;
                     }
                 }
-                System.out.println("after loopsaf");
                 JSONObject jsonObject = new JSONObject(json);
                 Request rq = new Request(jsonObject.getString("Type"), jsonObject.getJSONObject("Args"));//getting request type and arguments for it
-
+                System.out.println(rq);
 
                 /**CREATEACCOUNT*/
                 if (rq.getType().equals(RequestTypes.CREATEUSER.toString()))
                 {
                     System.out.println("createacc");
-                    int responseCode = CreateUser(rq.getArgs());
-                    outputStream.write(responseCode);
+                    JSONObject responseCode = APICommunication.createAccount(rq.getArgs());
+                    outputStream.write(responseCode.toString().getBytes());
+                    json = "";
                 }
                 /**LOGIN*/
                 else if (rq.getType().equals(RequestTypes.LOGIN.toString()))
                 {
-                    JSONObject arguments = jsonObject.getJSONObject("Args");
-                    JSONObject responseFromAPILogin = LoginUser(arguments.getString("Username"), arguments.getString("Password"));
-                    byte[] JSONBytes = responseFromAPILogin.toString().getBytes();
-                    System.out.println("RESPONSE SENT TO CLIENT " + new String(JSONBytes));
-                    outputStream.write(JSONBytes);
+                    JSONObject arguments = rq.getArgs();
+                    JSONObject responseFromAPILogin = APICommunication.login(arguments.getString("Username"), arguments.getString("Password"));
+                    System.out.println("RESPONSE SENT TO CLIENT " + responseFromAPILogin.toString());
+                    outputStream.write(responseFromAPILogin.toString().getBytes());
+                    json = "";
 
                 }
-                /**CLOSES THE CONNECTIONS*/
+
+                /**GETFISHER*/
+                else if (rq.getType().equals(RequestTypes.GETFISHER.toString()))
+                {
+                    JSONObject arguments = rq.getArgs();
+                    int id = arguments.getInt("id");
+                    String token = arguments.getString("token");
+                    JSONObject responseFromAPI =  APICommunication.getFisher(id,token);
+                    outputStream.write(responseFromAPI.toString().getBytes());
+                    json = "";
+
+                }
+                /**EDITFISHERSDATA*/
+                else if (rq.getType().equals(RequestTypes.EDITFISHER.toString()))
+                {
+                    System.out.println("EDITFISHER");
+                    JSONObject arguments = rq.getArgs();
+                    System.out.println( "args froom ediitfisher +"+arguments);
+                    int id = arguments.getInt("id");
+                    String token = arguments.getString("token");
+                    JSONObject responseFromAPI =  APICommunication.editFisher(id,arguments,token);
+                    outputStream.write(responseFromAPI.toString().getBytes());
+                    json = "";
+
+                }
+                /**CLOSES THE CONNECTIONS AND EXITS THE THREAD*/
                 else if (rq.getType().equals(RequestTypes.LOGOUT.toString()))
                 {
                     clientsocket.close();
+                    break;
                 }
+
             }
 
             //TODO : else statements
         } catch (IOException e)
         {
-            e.getMessage();
+            System.out.println(e.getMessage());
         }
 
-    }
-
-    public synchronized int CreateUser(JSONObject usr)
-    {
-
-        //prints response info 200 if successful
-        return APICommunication.registerAccount(usr);
-    }
-
-    public synchronized JSONObject LoginUser(String username, String password)
-    {
-        //return
-        //{"role":"Fisher","userID":9,"username":"client2","token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjkiLCJyb2xlIjoiRmlzaGVyIiwibmJmIjoxNTg5OTgwMDE2LCJleHAiOjE1ODk5ODM2MTYsImlhdCI6MTU4OTk4MDAxNn0.VsuyRw3i7mGd1-pr5uiOcYX9blJVh2hTcA-h9jtswmI"}
-        return APICommunication.login(username, password);
     }
 
     @Override

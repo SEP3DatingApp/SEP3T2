@@ -7,15 +7,18 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 
 public final class APICommunication
 {
     private static CloseableHttpClient client = HttpClients.createDefault();
     private static HttpPost httpPost;
 
-    public static int registerAccount(JSONObject usr)
+    public static synchronized JSONObject createAccount(JSONObject usr)
     {
         httpPost = new HttpPost("https://localhost:44380/users/register");
         String json = usr.toString();
@@ -36,81 +39,86 @@ public final class APICommunication
         try
         {
             response = client.execute(httpPost);
-            //            client.close();//TODO Causes error Connection pool shut down
         } catch (IOException e)
         {
             e.printStackTrace();
         }
-        System.out.println(response.getStatusLine().getStatusCode());
-        return response.getStatusLine().getStatusCode();
+
+        int responseCodeInt = response.getStatusLine().getStatusCode();
+        JSONObject responseCode = new JSONObject("{\"ResponseCode\": \"" + responseCodeInt + "\"}");
+        System.out.println(responseCode);
+        return responseCode;
     }
 
-    //TODO not used right now
+    //TODO token authent
 
-    //    public static int getUser(String username, String password)
-    //    {
-    //        URL urlForGetRequest = null;
-    //        try
-    //        {
-    //            urlForGetRequest = new URL("https://jsonplaceholder.typicode.com/posts/1");
-    //        } catch (MalformedURLException e)
-    //        {
-    //            e.printStackTrace();
-    //        }
-    //        String readLine = null;
-    //        HttpURLConnection conection = null;
-    //        try
-    //        {
-    //            conection = (HttpURLConnection) urlForGetRequest.openConnection();
-    //        } catch (IOException e)
-    //        {
-    //            e.printStackTrace();
-    //        }
-    //        try
-    //        {
-    //            conection.setRequestMethod("GET");
-    //        } catch (ProtocolException e)
-    //        {
-    //            e.printStackTrace();
-    //        }
-    //        conection.setRequestProperty(username, password); // set userId its a sample here
-    //        int responseCode = 0;
-    //
-    //
-    //        try
-    //        {
-    //            if (responseCode == HttpURLConnection.HTTP_OK)
-    //            {
-    //                BufferedReader in = new BufferedReader(new InputStreamReader(conection.getInputStream()));
-    //                StringBuffer response = new StringBuffer();
-    //                while ((readLine = in.readLine()) != null)
-    //                {
-    //                    response.append(readLine);
-    //                }
-    //                in.close();
-    //                // print result
-    //                System.out.println("JSON String Result " + response.toString());
-    //                //GetAndPost.POSTRequest(response.toString());
-    //            } else
-    //            {
-    //                System.out.println("GET NOT WORKED");
-    //            }
-    //            responseCode = conection.getResponseCode();
-    //        } catch (IOException e)
-    //        {
-    //            e.printStackTrace();
-    //        }
-    //        //TODO not finished
-    //
-    //        return responseCode;
-    //    }
+    public static synchronized JSONObject getFisher(int id, String token)
+    {
+        System.out.println("GeTUSER ID AND TOK " + id + "    " + token);
+        StringBuilder result = new StringBuilder();
+        URL url = null;
+        try
+        {
+            url = new URL("https://localhost:44380/users/" + id);
+        } catch (MalformedURLException e)
+        {
+            e.printStackTrace();
+        }
+        HttpURLConnection conn = null;
+        try
+        {
+            conn = (HttpURLConnection) url.openConnection();
+
+            try
+            {
+                conn.setRequestProperty("Authorization", "Bearer " + token);
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestMethod("GET");
+            } catch (ProtocolException e)
+            {
+                e.printStackTrace();
+            }
+            BufferedReader rd;
+
+            rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+            String line;
+            while ((line = rd.readLine()) != null)
+            {
+                result.append(line);
+            }
+            rd.close();
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        try
+        {
+            if (conn.getResponseCode() != 200)
+            {
+                JSONObject JSONResult = new JSONObject("{\"ResponseCode\": \"" + conn.getResponseCode() + "\"}");
+                return  JSONResult;
+            }
+            else {
+                JSONObject JSONResult = new JSONObject(result.toString());
+                System.out.println("GET USER = " + JSONResult);
+                return JSONResult;
+            }
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 
 
-    public static JSONObject login(String username, String password)
+    public static synchronized JSONObject login(String username, String password)
     {
         String responseBody = null;
         httpPost = new HttpPost("https://localhost:44380/users/Authenticate");
         String json = "{\"Username\": \"" + username + "\",\"Password\": \"" + password + "\"}";
+        System.out.println("+++++++++++" + json);
         StringEntity entity = null;
         try
         {
@@ -130,13 +138,67 @@ public final class APICommunication
             response = client.execute(httpPost);
 
             responseBody = new String(response.getEntity().getContent().readAllBytes());
-            //            client.close();
+
         } catch (IOException e)
         {
             e.getMessage();
         }
 
-        //        System.out.println(responseBody);
         return new JSONObject(responseBody);
     }
+
+        public static synchronized JSONObject editFisher(int id,JSONObject data, String token) //pass,sexpref,picref,discription
+        {
+            //TODO email and is active bool
+            URL url = null;
+            try
+            {
+                url = new URL("https://localhost:44380/users/" + id);
+            } catch (MalformedURLException e)
+            {
+                e.printStackTrace();
+            }
+            HttpURLConnection httpCon = null;
+            try
+            {
+                httpCon = (HttpURLConnection) url.openConnection();
+            } catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+            httpCon.setDoOutput(true);
+            try
+            {
+                httpCon.setRequestProperty("Authorization", "Bearer " + token);
+                httpCon.setRequestProperty("Content-Type", "application/json");
+                httpCon.setRequestMethod("PUT");
+            } catch (ProtocolException e)
+            {
+                e.printStackTrace();
+            }
+            try
+            {
+
+                OutputStreamWriter out = new OutputStreamWriter(httpCon.getOutputStream());
+                String Jsondata = "{\"Password\": \"" + data.get("Password") + "\",\"SexPref\": \"" + data.getString("SexPref") + /**"\",\"PicRef\": \"" + data.getString("PicRef") +**/  "\",\"Description\": \"" + data.getString("Description") +  "\"}";
+                System.out.println("JSON DATA PUT ++++"+ Jsondata);
+
+
+                out.write(Jsondata);
+                out.close();
+                httpCon.getInputStream();
+            } catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+            JSONObject JSONResult = null;
+            try
+            {
+                JSONResult = new JSONObject("{\"ResponseCode\": \"" + httpCon.getResponseCode() + "\"}");
+            } catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+            return  JSONResult;
+        }
 }
