@@ -20,6 +20,7 @@ public final class APICommunication
 
     public static synchronized JSONObject createAccount(JSONObject usr)
     {
+        //todo add firstname,gender,sex
         httpPost = new HttpPost("https://localhost:44380/users/register");
         String json = usr.toString();
         StringEntity entity = null;
@@ -50,7 +51,7 @@ public final class APICommunication
         return responseCode;
     }
 
-    //TODO token authent
+
 
     public static synchronized JSONObject getFisher(int id, String token)
     {
@@ -59,7 +60,7 @@ public final class APICommunication
         URL url = null;
         try
         {
-            url = new URL("https://localhost:44380/users/" + id);
+            url = new URL("https://localhost:44380/users/getuser/" + id);
         } catch (MalformedURLException e)
         {
             e.printStackTrace();
@@ -154,6 +155,7 @@ public final class APICommunication
             try
             {
                 url = new URL("https://localhost:44380/users/" + id);
+                System.out.println("we got the id " + id);
             } catch (MalformedURLException e)
             {
                 e.printStackTrace();
@@ -178,9 +180,17 @@ public final class APICommunication
             }
             try
             {
-
+                String password;
                 OutputStreamWriter out = new OutputStreamWriter(httpCon.getOutputStream());
-                String Jsondata = "{\"Password\": \"" + data.get("Password") + "\",\"SexPref\": \"" + data.getString("SexPref") + /**"\",\"PicRef\": \"" + data.getString("PicRef") +**/  "\",\"Description\": \"" + data.getString("Description") +  "\"}";
+                if (data.get("Password").toString().equals("null"))
+                {
+                    password = null;
+                } else
+                {
+                    password = "\"" + data.get("Password").toString() + "\"";
+                }
+
+                String Jsondata = "{\"Password\": " + password + ",\"SexPref\": \"" + data.getString("SexPref") + "\",\"Email\": \"" + data.getString("Email") +  "\",\"Description\": \"" + data.getString("Description") +  "\",\"IsActive\": " + data.getBoolean("IsActive") + "}";
                 System.out.println("JSON DATA PUT ++++"+ Jsondata);
 
 
