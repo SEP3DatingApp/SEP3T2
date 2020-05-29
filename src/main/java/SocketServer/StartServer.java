@@ -15,11 +15,14 @@ public class StartServer
         {
             serverSocket = new ServerSocket(port);
             System.out.println("Server started");
+            int client = 0;
             while (true)
             {
                 clientSocket = serverSocket.accept();
                 System.out.println("Connected!");
                 Thread th = new Thread(new Connected(clientSocket));
+                client++;
+                System.out.println("client number" + client);
                 th.start();
             }
         } catch (IOException e)

@@ -7,5 +7,6 @@ public enum RequestTypes
     CREATEUSER,
     EDITFISHER,
     LOGIN,
-    LOGOUT
+    LOGOUT,
+    GETFISHERSBYPREFERENCE
 }

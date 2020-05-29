@@ -140,17 +140,24 @@ public final class APICommunication
 
             responseBody = new String(response.getEntity().getContent().readAllBytes());
 
+
         } catch (IOException e)
         {
             e.getMessage();
         }
+        if (responseBody == null)
+        {
+            return new JSONObject("{\"ResponseCode\": \"Can't connect to T3 \"}");
+        }
+        else
+        {
+            return new JSONObject(responseBody);
 
-        return new JSONObject(responseBody);
+        }
     }
 
         public static synchronized JSONObject editFisher(int id,JSONObject data, String token) //pass,sexpref,picref,discription
         {
-            //TODO email and is active bool
             URL url = null;
             try
             {
@@ -211,4 +218,49 @@ public final class APICommunication
             }
             return  JSONResult;
         }
+
+    public static JSONObject getAllFishersAccordingToTheirPref(int yourid, String token) //todo , int prefValue will be made from sex pref and gender
+    {
+        /**GETTING DATA ABOUT THE USER BY ID*/
+        JSONObject dataAboutUser = getFisher(yourid,token);
+        String sexPref = dataAboutUser.getString("sexPref");
+        String gender = dataAboutUser.getString("gender");
+
+        /***/
+
+
+//
+//        httpPost = new HttpPost("https://localhost:44380/users/GetFishersPref");
+//        String json = usr.toString();
+//        StringEntity entity = null;
+//        try
+//        {
+//            entity = new StringEntity(json);
+//
+//        } catch (UnsupportedEncodingException e)
+//        {
+//            e.printStackTrace();
+//        }
+//        httpPost.setEntity(entity);
+//        httpPost.setHeader("Accept", "application/json");
+//        httpPost.setHeader("Content-type", "application/json");
+//
+//        CloseableHttpResponse response = null;
+//        try
+//        {
+//            response = client.execute(httpPost);
+//        } catch (IOException e)
+//        {
+//            e.printStackTrace();
+//        }
+//
+//        int responseCodeInt = response.getStatusLine().getStatusCode();
+//        JSONObject responseCode = new JSONObject("{\"ResponseCode\": \"" + responseCodeInt + "\"}");
+//        System.out.println(responseCode);
+//        return responseCode;
+        return null;
+    }
+
+
+
 }

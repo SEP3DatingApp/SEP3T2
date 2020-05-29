@@ -39,7 +39,7 @@ public class Connected implements Runnable
                 while ((count = inputStream.read(bytes)) != 0)
                 {
                     json += new String(bytes, 0, count);
-//                    System.out.println(json);//testing if we receive any data at all
+                    //                    System.out.println(json);//testing if we receive any data at all
                     if (json.contains(";"))
                     {
                         json.replace(";", "");
@@ -75,7 +75,7 @@ public class Connected implements Runnable
                     JSONObject arguments = rq.getArgs();
                     int id = arguments.getInt("id");
                     String token = arguments.getString("token");
-                    JSONObject responseFromAPI =  APICommunication.getFisher(id,token);
+                    JSONObject responseFromAPI = APICommunication.getFisher(id, token);
                     outputStream.write(responseFromAPI.toString().getBytes());
                     json = "";
 
@@ -85,10 +85,23 @@ public class Connected implements Runnable
                 {
                     System.out.println("EDITFISHER");
                     JSONObject arguments = rq.getArgs();
-                    System.out.println( "args froom ediitfisher +"+arguments);
+                    System.out.println("args froom ediitfisher +" + arguments);
                     int id = arguments.getInt("id");
                     String token = arguments.getString("token");
-                    JSONObject responseFromAPI =  APICommunication.editFisher(id,arguments,token);
+                    JSONObject responseFromAPI = APICommunication.editFisher(id, arguments, token);
+                    outputStream.write(responseFromAPI.toString().getBytes());
+                    json = "";
+
+                }
+                /**GETFISHESRBYPREFERENCE*/
+                else if (rq.getType().equals(RequestTypes.GETFISHERSBYPREFERENCE.toString()))
+                {
+                    JSONObject arguments = rq.getArgs();
+                    System.out.println("args froom GETFISHERSBYPREFERENCE +" + arguments);
+                    int id = arguments.getInt("id");
+                    String token = arguments.getString("token");
+                    JSONObject responseFromAPI =  APICommunication.getAllFishersAccordingToTheirPref(id, token);
+
                     outputStream.write(responseFromAPI.toString().getBytes());
                     json = "";
 
@@ -96,12 +109,14 @@ public class Connected implements Runnable
                 /**CLOSES THE CONNECTIONS AND EXITS THE THREAD*/
                 else if (rq.getType().equals(RequestTypes.LOGOUT.toString()))
                 {
+                    System.out.println("LOGOUT");
                     clientsocket.close();
+
                     break;
                 }
 
             }
-
+            System.out.println("Client have disconected");
             //TODO : else statements
         } catch (IOException e)
         {
