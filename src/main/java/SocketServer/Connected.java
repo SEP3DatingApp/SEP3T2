@@ -33,6 +33,7 @@ public class Connected implements Runnable
 
             int count;
             byte[] bytes = new byte[100];
+            String token = null;
             while (true)
             {
                 System.out.println("loop");
@@ -63,7 +64,8 @@ public class Connected implements Runnable
                 {
                     JSONObject arguments = rq.getArgs();
                     JSONObject responseFromAPILogin = APICommunication.login(arguments.getString("Username"), arguments.getString("Password"));
-                    System.out.println("RESPONSE SENT TO CLIENT " + responseFromAPILogin.toString());
+                    token = responseFromAPILogin.getString("token");
+                    System.out.println("client token" + token);
                     outputStream.write(responseFromAPILogin.toString().getBytes());
                     json = "";
 
@@ -74,7 +76,6 @@ public class Connected implements Runnable
                 {
                     JSONObject arguments = rq.getArgs();
                     int id = arguments.getInt("id");
-                    String token = arguments.getString("token");
                     JSONObject responseFromAPI = APICommunication.getFisher(id, token);
                     outputStream.write(responseFromAPI.toString().getBytes());
                     json = "";
@@ -87,7 +88,6 @@ public class Connected implements Runnable
                     JSONObject arguments = rq.getArgs();
                     System.out.println("args froom ediitfisher +" + arguments);
                     int id = arguments.getInt("id");
-                    String token = arguments.getString("token");
                     JSONObject responseFromAPI = APICommunication.editFisher(id, arguments, token);
                     outputStream.write(responseFromAPI.toString().getBytes());
                     json = "";
@@ -99,21 +99,20 @@ public class Connected implements Runnable
                     JSONObject arguments = rq.getArgs();
                     System.out.println("args froom GETFISHERSBYPREFERENCE +" + arguments);
                     int id = arguments.getInt("id");
-                    String token = arguments.getString("token");
                     JSONObject responseFromAPI =  APICommunication.getAllFishersAccordingToTheirPref(id, token);
-
                     outputStream.write(responseFromAPI.toString().getBytes());
                     json = "";
-
                 }
                 /**CLOSES THE CONNECTIONS AND EXITS THE THREAD*/
                 else if (rq.getType().equals(RequestTypes.LOGOUT.toString()))
                 {
                     System.out.println("LOGOUT");
                     clientsocket.close();
-
+                    outputStream.close();
+                    inputStream.close();
                     break;
                 }
+                //todo like,reject to send only id which you like
 
             }
             System.out.println("Client have disconected");

@@ -20,7 +20,7 @@ public final class APICommunication
 
     public static synchronized JSONObject createAccount(JSONObject usr)
     {
-        //todo add firstname,gender,sex
+
         httpPost = new HttpPost("https://localhost:44380/users/register");
         String json = usr.toString();
         StringEntity entity = null;
@@ -75,6 +75,7 @@ public final class APICommunication
                 conn.setRequestProperty("Authorization", "Bearer " + token);
                 conn.setRequestProperty("Content-Type", "application/json");
                 conn.setRequestMethod("GET");
+
             } catch (ProtocolException e)
             {
                 e.printStackTrace();
@@ -223,10 +224,86 @@ public final class APICommunication
     {
         /**GETTING DATA ABOUT THE USER BY ID*/
         JSONObject dataAboutUser = getFisher(yourid,token);
-        String sexPref = dataAboutUser.getString("sexPref");
+        int sexPref = dataAboutUser.getInt("PersonSexualityId");
         String gender = dataAboutUser.getString("gender");
-
         /***/
+
+        //converting sexPref to number
+//        int sexPrefValue = 0;
+        /*
+        * M - Male , F - Female , 1 - Straight, 2 - Gay , 3 - Bi-Sexual
+        *
+        * */
+//        if (sexPref.equals("S"))
+//        {
+//            sexPrefValue = 1;
+//        }
+//        else if(sexPref.equals("G"))
+//        {
+//            sexPrefValue = 2;
+//        }
+//        else if (sexPref.equals("B"))
+//        {
+//            sexPrefValue = 3;
+//        }
+
+        //URI = "GetFishersPref/{gender};{sexPref}"
+        StringBuilder result = new StringBuilder();
+        URL url = null;
+        try
+        {
+            url = new URL("https://localhost:44380/users/GetFishersPref/" + gender + ";" + sexPref);
+        } catch (MalformedURLException e)
+        {
+            e.printStackTrace();
+        }
+        HttpURLConnection conn = null;
+        try
+        {
+            conn = (HttpURLConnection) url.openConnection();
+
+            try
+            {
+                conn.setRequestProperty("Authorization", "Bearer " + token);
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestMethod("GET");
+            } catch (ProtocolException e)
+            {
+                e.printStackTrace();
+            }
+            BufferedReader rd;
+
+            rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+            String line;
+            while ((line = rd.readLine()) != null)
+            {
+                result.append(line);
+            }
+            rd.close();
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        try
+        {
+            if (conn.getResponseCode() != 200)
+            {
+                JSONObject JSONResult = new JSONObject("{\"ResponseCode\": \"" + conn.getResponseCode() + "\"}");
+                return  JSONResult;
+            }
+            else {
+                JSONObject JSONResult = new JSONObject(result.toString());
+                System.out.println("GET USERS by PREF = " + JSONResult);
+                return JSONResult;
+            }
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        return null;
+
 
 
 //
@@ -258,7 +335,7 @@ public final class APICommunication
 //        JSONObject responseCode = new JSONObject("{\"ResponseCode\": \"" + responseCodeInt + "\"}");
 //        System.out.println(responseCode);
 //        return responseCode;
-        return null;
+
     }
 
 
