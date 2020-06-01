@@ -3,6 +3,7 @@ package SocketServer;
 import APICommunication.APICommunication;
 import Shared.Request;
 import Shared.RequestTypes;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -33,10 +34,9 @@ public class Connected implements Runnable
 
             int count;
             byte[] bytes = new byte[100];
-            String token = null;
+            String token = "";
             while (true)
             {
-                System.out.println("loop");
                 while ((count = inputStream.read(bytes)) != 0)
                 {
                     json += new String(bytes, 0, count);
@@ -49,12 +49,10 @@ public class Connected implements Runnable
                 }
                 JSONObject jsonObject = new JSONObject(json);
                 Request rq = new Request(jsonObject.getString("Type"), jsonObject.getJSONObject("Args"));//getting request type and arguments for it
-                System.out.println(rq);
 
                 /**CREATEACCOUNT*/
                 if (rq.getType().equals(RequestTypes.CREATEUSER.toString()))
                 {
-                    System.out.println("createacc");
                     JSONObject responseCode = APICommunication.createAccount(rq.getArgs());
                     outputStream.write(responseCode.toString().getBytes());
                     json = "";
@@ -65,7 +63,6 @@ public class Connected implements Runnable
                     JSONObject arguments = rq.getArgs();
                     JSONObject responseFromAPILogin = APICommunication.login(arguments.getString("Username"), arguments.getString("Password"));
                     token = responseFromAPILogin.getString("token");
-                    System.out.println("client token" + token);
                     outputStream.write(responseFromAPILogin.toString().getBytes());
                     json = "";
 
@@ -84,9 +81,7 @@ public class Connected implements Runnable
                 /**EDITFISHERSDATA*/
                 else if (rq.getType().equals(RequestTypes.EDITFISHER.toString()))
                 {
-                    System.out.println("EDITFISHER");
                     JSONObject arguments = rq.getArgs();
-                    System.out.println("args froom ediitfisher +" + arguments);
                     int id = arguments.getInt("id");
                     JSONObject responseFromAPI = APICommunication.editFisher(id, arguments, token);
                     outputStream.write(responseFromAPI.toString().getBytes());
@@ -94,12 +89,30 @@ public class Connected implements Runnable
 
                 }
                 /**GETFISHESRBYPREFERENCE*/
-                else if (rq.getType().equals(RequestTypes.GETFISHERSBYPREFERENCE.toString()))
+                else if (rq.getType().equals(RequestTypes.MATCHLIST.toString()))
                 {
                     JSONObject arguments = rq.getArgs();
                     System.out.println("args froom GETFISHERSBYPREFERENCE +" + arguments);
                     int id = arguments.getInt("id");
-                    JSONObject responseFromAPI =  APICommunication.getAllFishersAccordingToTheirPref(id, token);
+                    JSONArray responseFromAPI =  APICommunication.getAllFishersAccordingToTheirPref(id, token);
+                    outputStream.write(responseFromAPI.toString().getBytes());
+                    json = "";
+                }
+                /**LIKE*/
+
+                else if (rq.getType().equals(RequestTypes.LIKE.toString()))
+                {
+                    JSONObject arguments = rq.getArgs();
+                    int id = arguments.getInt("OtherId");
+                    JSONObject responseFromAPI =  APICommunication.like(id, token);
+                    outputStream.write(responseFromAPI.toString().getBytes());
+                    json = "";
+                }
+                else if (rq.getType().equals(RequestTypes.REJECT.toString()))
+                {
+                    JSONObject arguments = rq.getArgs();
+                    int id = arguments.getInt("OtherId");
+                    JSONObject responseFromAPI =  APICommunication.reject(id, token);
                     outputStream.write(responseFromAPI.toString().getBytes());
                     json = "";
                 }

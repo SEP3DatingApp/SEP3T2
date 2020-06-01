@@ -8,5 +8,7 @@ public enum RequestTypes
     EDITFISHER,
     LOGIN,
     LOGOUT,
-    GETFISHERSBYPREFERENCE
+    MATCHLIST,
+    LIKE,
+    REJECT;
 }
