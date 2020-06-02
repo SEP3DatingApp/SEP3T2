@@ -60,11 +60,23 @@ public class Connected implements Runnable
                 /**LOGIN*/
                 else if (rq.getType().equals(RequestTypes.LOGIN.toString()))
                 {
+
                     JSONObject arguments = rq.getArgs();
                     JSONObject responseFromAPILogin = APICommunication.login(arguments.getString("Username"), arguments.getString("Password"));
-                    token = responseFromAPILogin.getString("token");
-                    outputStream.write(responseFromAPILogin.toString().getBytes());
-                    json = "";
+                    if(!(responseFromAPILogin.toString().equals("{\"message\":\"Username or password is incorrect\"}")))
+                    {
+
+                        token = responseFromAPILogin.getString("token");
+                        System.out.println("TRUEEEEEEEEEEE" + responseFromAPILogin);
+                        outputStream.write(responseFromAPILogin.toString().getBytes());
+                        json = "";
+                    }
+                    else
+                    {
+                        outputStream.write(responseFromAPILogin.toString().getBytes());
+                        json = "";
+                    }
+
 
                 }
 
@@ -95,6 +107,7 @@ public class Connected implements Runnable
                     System.out.println("args froom GETFISHERSBYPREFERENCE +" + arguments);
                     int id = arguments.getInt("id");
                     JSONArray responseFromAPI =  APICommunication.getAllFishersAccordingToTheirPref(id, token);
+                    System.out.println("++++++++"+responseFromAPI);
                     outputStream.write(responseFromAPI.toString().getBytes());
                     json = "";
                 }
