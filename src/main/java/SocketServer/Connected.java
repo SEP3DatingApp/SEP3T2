@@ -63,20 +63,17 @@ public class Connected implements Runnable
 
                     JSONObject arguments = rq.getArgs();
                     JSONObject responseFromAPILogin = APICommunication.login(arguments.getString("Username"), arguments.getString("Password"));
-                    if(!(responseFromAPILogin.toString().equals("{\"message\":\"Username or password is incorrect\"}")))
+                    if (!(responseFromAPILogin.toString().equals("{\"message\":\"Username or password is incorrect\"}")))
                     {
-
-                        token = responseFromAPILogin.getString("token");
-                        System.out.println("TRUEEEEEEEEEEE" + responseFromAPILogin);
+                        System.out.println(responseFromAPILogin.toString());
+                        token = responseFromAPILogin.getString("Token");
                         outputStream.write(responseFromAPILogin.toString().getBytes());
                         json = "";
-                    }
-                    else
+                    } else
                     {
                         outputStream.write(responseFromAPILogin.toString().getBytes());
                         json = "";
                     }
-
 
                 }
 
@@ -104,10 +101,8 @@ public class Connected implements Runnable
                 else if (rq.getType().equals(RequestTypes.MATCHLIST.toString()))
                 {
                     JSONObject arguments = rq.getArgs();
-                    System.out.println("args froom GETFISHERSBYPREFERENCE +" + arguments);
                     int id = arguments.getInt("id");
-                    JSONArray responseFromAPI =  APICommunication.getAllFishersAccordingToTheirPref(id, token);
-                    System.out.println("++++++++"+responseFromAPI);
+                    JSONArray responseFromAPI = APICommunication.getAllFishersAccordingToTheirPref(id, token);
                     outputStream.write(responseFromAPI.toString().getBytes());
                     json = "";
                 }
@@ -117,15 +112,14 @@ public class Connected implements Runnable
                 {
                     JSONObject arguments = rq.getArgs();
                     int id = arguments.getInt("OtherId");
-                    JSONObject responseFromAPI =  APICommunication.like(id, token);
+                    JSONObject responseFromAPI = APICommunication.like(id, token);
                     outputStream.write(responseFromAPI.toString().getBytes());
                     json = "";
-                }
-                else if (rq.getType().equals(RequestTypes.REJECT.toString()))
+                } else if (rq.getType().equals(RequestTypes.REJECT.toString()))
                 {
                     JSONObject arguments = rq.getArgs();
                     int id = arguments.getInt("OtherId");
-                    JSONObject responseFromAPI =  APICommunication.reject(id, token);
+                    JSONObject responseFromAPI = APICommunication.reject(id, token);
                     outputStream.write(responseFromAPI.toString().getBytes());
                     json = "";
                 }
@@ -133,9 +127,6 @@ public class Connected implements Runnable
                 else if (rq.getType().equals(RequestTypes.LOGOUT.toString()))
                 {
                     System.out.println("LOGOUT");
-                    clientsocket.close();
-                    outputStream.close();
-                    inputStream.close();
                     break;
                 }
                 //todo like,reject to send only id which you like

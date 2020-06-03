@@ -1,4 +1,5 @@
 package APICommunication;
+
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -6,6 +7,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -16,6 +18,7 @@ public final class APICommunication
 {
     private static CloseableHttpClient client = HttpClients.createDefault();
     private static HttpPost httpPost;
+
     public static synchronized JSONObject createAccount(JSONObject usr)
     {
 
@@ -179,7 +182,6 @@ public final class APICommunication
             }
 
             String Jsondata = "{\"Password\": " + password + ",\"PersonSexualityId\": " + data.getInt("PersonSexualityId") + ",\"Email\": \"" + data.getString("Email") + "\",\"Description\": \"" + data.getString("Description") + "\",\"IsActive\": " + data.getBoolean("IsActive") + "}";
-            System.out.println(Jsondata);
             out.write(Jsondata);
             out.close();
             httpCon.getInputStream();
@@ -203,8 +205,8 @@ public final class APICommunication
     {
         /**GETTING DATA ABOUT THE USER BY ID*/
         JSONObject dataAboutUser = getFisher(yourid, token);
-        int sexPref = dataAboutUser.getInt("personSexualityId");
-        String gender = dataAboutUser.getString("gender");
+        int sexPref = dataAboutUser.getInt("PersonSexualityId");
+        String gender = dataAboutUser.getString("Gender");
         /***/
         StringBuilder result = new StringBuilder();
         URL url = null;
