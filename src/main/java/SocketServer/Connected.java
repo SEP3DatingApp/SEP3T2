@@ -4,6 +4,7 @@ import APICommunication.APICommunication;
 import Shared.Request;
 import Shared.RequestTypes;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -40,7 +41,6 @@ public class Connected implements Runnable
                 while ((count = inputStream.read(bytes)) != 0)
                 {
                     json += new String(bytes, 0, count);
-                    //                    System.out.println(json);//testing if we receive any data at all
                     if (json.contains(";"))
                     {
                         json.replace(";", "");
@@ -65,10 +65,22 @@ public class Connected implements Runnable
                     JSONObject responseFromAPILogin = APICommunication.login(arguments.getString("Username"), arguments.getString("Password"));
                     if (!(responseFromAPILogin.toString().equals("{\"message\":\"Username or password is incorrect\"}")))
                     {
-                        System.out.println(responseFromAPILogin.toString());
-                        token = responseFromAPILogin.getString("Token");
-                        outputStream.write(responseFromAPILogin.toString().getBytes());
-                        json = "";
+                        try
+                        {
+                            System.out.println(responseFromAPILogin.toString());
+                            token = responseFromAPILogin.getString("Token");
+                            outputStream.write(responseFromAPILogin.toString().getBytes());
+                            json = "";
+                        } catch (JSONException e)
+                        {
+                            System.out.println(e.getMessage());
+                            outputStream.write("{\"message\":\"Username or password is incorrect\"}".getBytes());
+                        } catch (IOException e)
+                        {
+                            e.printStackTrace();
+
+                        }
+
                     } else
                     {
                         outputStream.write(responseFromAPILogin.toString().getBytes());
